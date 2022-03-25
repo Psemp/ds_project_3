@@ -1,27 +1,33 @@
 import pandas as pd
 
+from unidecode import unidecode
+
 
 def get_green_rating(series: pd.Series, label_dict: dict):
-    label_rating = 0
+    label_rating_bio = 0
+    label_rating_eco = 0
     palm_rating = 0
 
-    labels = series["labels_fr"].lower().replace(" ", "").split(',')
+    if pd.notna(series["labels_fr"]):
+        try:
+            labels = unidecode(series["labels_fr"].lower().replace(" ", "")).split(',')
+            for label in labels:
+                checker = [i for i in label_dict["bio"] if label in i]
+                if len(checker) != 0:
+                    label_rating_bio += 1
+                checker = [i for i in label_dict["eco"] if label in i]
+                if len(checker) != 0:
+                    label_rating_eco += 1
+                checker = []
+        except ValueError:
+            pass
 
-    for label in labels:
-        checker = [i for i in label_dict["negative"] if label in i]
-        if len(checker) != 0:
-            label_rating -= 1
-        checker = [i for i in label_dict["positive"] if label in i]
-        if len(checker) != 0:
-            label_rating += 1
-        checker = []
-
-    if series["ingredients_from_palm_oil_n"].notna():
+    if pd.notna(series["ingredients_from_palm_oil_n"]):
         if series["ingredients_from_palm_oil_n"] != 0:
             palm_rating -= 1
-    if series["ingredients_that_may_be_from_palm_oil_n"].notna():
+    if pd.notna(series["ingredients_that_may_be_from_palm_oil_n"]):
         if series["ingredients_that_may_be_from_palm_oil_n"] != 0 and palm_rating == 0:
             palm_rating -= 1
 
-    green_rating = label_rating + palm_rating
+    green_rating = label_rating_eco + label_rating_bio + palm_rating
     return green_rating
