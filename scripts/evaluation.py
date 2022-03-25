@@ -19,7 +19,7 @@ def get_green_rating(series: pd.Series, label_dict: dict):
                 if len(checker) != 0:
                     label_rating_eco += 1
                 checker = []
-        except ValueError:
+        except (ValueError, AttributeError):
             pass
 
     if pd.notna(series["ingredients_from_palm_oil_n"]):
