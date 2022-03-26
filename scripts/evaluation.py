@@ -1,33 +1,44 @@
 import pandas as pd
+import numpy as np
 
 from unidecode import unidecode
 
 
-def get_green_rating(series: pd.Series, label_dict: dict):
-    label_rating_bio = 0
-    label_rating_eco = 0
-    palm_rating = 0
+def get_green_rating(series: pd.Series, bio_list: list):
+    """
+    Takes a series and defines if a label is in bio_list to find if product is organic
+    and evaluates possible amount of palm oil, returns dict of results
+    """
+    result_dict = {
+        "org": np.nan,
+        "palm_oil": np.nan
+    }
 
     if pd.notna(series["labels_fr"]):
+        organic = False
         try:
             labels = unidecode(series["labels_fr"].lower().replace(" ", "")).split(',')
             for label in labels:
-                checker = [i for i in label_dict["bio"] if label in i]
-                if len(checker) != 0:
-                    label_rating_bio += 1
-                checker = [i for i in label_dict["eco"] if label in i]
-                if len(checker) != 0:
-                    label_rating_eco += 1
-                checker = []
+                checker = [i for i in bio_list if label in i]
+                if len(checker) != 0 and not organic:
+                    result_dict["org"] = True
         except (ValueError, AttributeError):
             pass
 
     if pd.notna(series["ingredients_from_palm_oil_n"]):
-        if series["ingredients_from_palm_oil_n"] != 0:
-            palm_rating -= 1
-    if pd.notna(series["ingredients_that_may_be_from_palm_oil_n"]):
-        if series["ingredients_that_may_be_from_palm_oil_n"] != 0 and palm_rating == 0:
-            palm_rating -= 1
+        contains_palm = False
 
-    green_rating = label_rating_eco + label_rating_bio + palm_rating
-    return green_rating
+        if int(series["ingredients_from_palm_oil_n"]) > 0:
+            contains_palm = True
+            result_dict["palm_oil"] = True
+            return result_dict
+        elif int(series["ingredients_from_palm_oil_n"]) == 0:
+            pass
+
+    if pd.notna(series["ingredients_that_may_be_from_palm_oil_n"]) and not contains_palm:
+        if int(series["ingredients_that_may_be_from_palm_oil_n"]) > 0:
+            result_dict["palm_oil"] = True
+        elif int(series["ingredients_that_may_be_from_palm_oil_n"]) == 0:
+            series["palm_oil"] = False
+
+    return result_dict
