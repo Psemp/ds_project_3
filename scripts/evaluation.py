@@ -31,7 +31,6 @@ def get_green_rating(series: pd.Series, bio_list: list):
         if int(series["ingredients_from_palm_oil_n"]) > 0:
             contains_palm = True
             result_dict["palm_oil"] = True
-            return result_dict
         elif int(series["ingredients_from_palm_oil_n"]) == 0:
             pass
 
