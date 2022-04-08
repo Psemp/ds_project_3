@@ -59,8 +59,8 @@ def display_circles(pcs, n_comp, pca, axis_ranks, labels=None, label_rotation=0,
             plt.plot([0, 0], [-1, 1], color='grey', ls='--')
 
             # nom des axes, avec le pourcentage d'inertie expliqué
-            plt.xlabel(f"F{d1+1} ({round(100*pca.explained_variance_ratio_[d1],1)}%)")
-            plt.ylabel(f"F{d2+1} ({round(100*pca.explained_variance_ratio_[d2],1)}%)")
+            plt.xlabel(f"PC{d1+1} ({round(100*pca.explained_variance_ratio_[d1],1)}%)")
+            plt.ylabel(f"PC{d2+1} ({round(100*pca.explained_variance_ratio_[d2],1)}%)")
 
-            plt.title(f"Cercle des corrélations (F{d1 + 1} et F{d2 + 1})")
+            plt.title(f"Cercle des corrélations (PC{d1 + 1} et PC{d2 + 1})")
             plt.show(block=False)

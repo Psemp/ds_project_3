@@ -157,3 +157,4 @@ cython_debug/
 data/off_dataset.tsv
 data/*
 data
+*.png
